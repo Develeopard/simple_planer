@@ -1,7 +1,8 @@
 <template>
   <div class="home">
+    <FilterNav @filterChange="current = $event"  :current="current"/>
     <div v-if="projects.length">
-      <div v-for="project in projects" :key="project.id">
+      <div v-for="project in filteredProjects()" :key="project.id">
         <SingleProject 
           :project="project" 
           @delete="handleDelete" 
@@ -15,16 +16,19 @@
 <script>
 import { onMounted, ref } from '@vue/runtime-core'
 import SingleProject from '../components/SingleProject.vue'
+import FilterNav from '../components/FilterNav.vue'
 
 
 export default {
   name: 'Home',
   components: {
-    SingleProject
+    SingleProject,
+    FilterNav
   },
   setup(){
     const projects = ref([])
     const error = ref(null)
+    const current = ref('all')
 
     onMounted(() => {
       try{
@@ -38,7 +42,7 @@ export default {
         error.value = err.message
         console.log(error.value);
       }
-      console.log(projects.value);
+      // console.log(projects.value);
     })
 
     function handleDelete(id){
@@ -54,10 +58,22 @@ export default {
       p.complete = !p.complete
     }
 
+    function filteredProjects(){
+      if( current.value === 'completed'){
+        return projects.value.filter(project => project.complete)
+      }
+      if( current.value === 'ongoing'){
+        return projects.value.filter(project => !project.complete)
+      }
+      return projects.value
+    }
+
     return{
       projects,
       handleDelete,
-      handleComplete
+      handleComplete,
+      current,
+      filteredProjects
     }
   }
 }

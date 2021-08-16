@@ -1,5 +1,5 @@
 <template>
-  <form>
+  <form @submit.prevent="handleSubmit">
       <label>Title:</label>
       <input type="text" v-model="title" required>
       <label>Details:</label>
@@ -11,11 +11,14 @@
 <script>
 import { ref } from '@vue/reactivity'
 import { onMounted } from '@vue/runtime-core'
+import { useRouter } from 'vue-router'
 export default {
     props: ['id'],
     setup(props){
         const title = ref('')
         const details = ref('')
+
+        const router = useRouter()
 
         const uri = ref('http://localhost:3000/projects/' + props.id)
 
@@ -29,11 +32,22 @@ export default {
                 })
                 console.log('component mounted');
         })
+
+        function handleSubmit(){
+            fetch(uri.value, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({title: title.value, details: details.value})
+            }).then(() => {
+                router.push('/')
+            }).catch((err) => console.log(err))
+        }
         
         return{
             title,
             details,
-            uri
+            uri,
+            handleSubmit
         }
     }
 }
