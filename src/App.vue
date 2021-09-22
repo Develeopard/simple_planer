@@ -15,7 +15,7 @@ export default{
 
 <style>
 body{
-  background: rgb(233, 233, 233);
+  background: rgb(221, 218, 218);
 }
 
 #app {
